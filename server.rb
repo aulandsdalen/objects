@@ -39,6 +39,13 @@ s = TCPServer.new(addr, port)
 puts "Started #{s} at #{addr}:#{port}"
 objects_list = []
 
+l = Thread.new {
+	loop {
+		puts "current object list: #{objects_list}"
+		sleep 1
+	}
+}
+
 loop {
 	Thread.start(s.accept) do |client|
 		puts "spawned #{Thread.current.object_id}"
