@@ -19,7 +19,13 @@ def parse_request(request, objects_list)
 		objects_list.push(Thread.current.object_id.to_s)
 	else
 		if objects_list.include?(requester_id) # we should check do we have object registered
-			reply_array.push("you're in the list")
+			request_array.each_with_index do |data, i|
+				case data
+				when 'delete'
+					objects_list.delete(requester_id)
+					reply_array.push("deleted")
+				end
+			end
 		else
 			reply_array.push("unknown")
 		end
@@ -31,6 +37,20 @@ def parse_request(request, objects_list)
 	reply_string
 end 
 
+def log(filename, string_to_log)
+	logfile = File.new(filename, "a+")
+	logfile.flock(File::LOCK_EX) # lock file to be sure that we're thread-safe here
+	logfile.write("#{string_to_log}\n")
+	logfile.close
+end
+
+trap "SIGINT" do  # write epoch_end to file
+	epoch_end = Time.now.to_i
+	puts "\nepoch_end is #{epoch_end}, exiting..."
+	exit 130
+end
+
+
 addr = "0.0.0.0"
 port = "5555"
 
@@ -38,11 +58,25 @@ s = TCPServer.new(addr, port)
 
 puts "Started #{s} at #{addr}:#{port}"
 objects_list = []
+tick_count = 0
+filename = "#{Time.now.to_s}.txt" # use current time as filename
+epoch_start = Time.now.to_i
+tick_duration = 1 # CHANGE ME 
+reference_frame = {
+	:epoch_start => epoch_start,
+	:tick_duration => tick_duration
+}
+
+log(filename, reference_frame)
+
+puts "Starting with #{reference_frame}"
 
 l = Thread.new {
 	loop {
-		puts "current object list: #{objects_list}"
-		sleep 1
+		tick_count += 1
+		puts "tick # #{tick_count}: #{objects_list}"
+		log(filename, "tick # #{tick_count}: #{objects_list}")
+		sleep tick_duration
 	}
 }
 
