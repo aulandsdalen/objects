@@ -11,7 +11,6 @@ def parse_request(request, objects_list)
 		request_array.each do |data|
 			reply = case data
 			when 'id' then Thread.current.object_id
-			when 'time' then Time.now.to_i
 			else 'unknown'
 			end
 			reply_array.push(reply)
@@ -24,6 +23,13 @@ def parse_request(request, objects_list)
 				when 'delete'
 					objects_list.delete(requester_id)
 					reply_array.push("deleted")
+				when 'log'
+					log_message = request_array[i+1]
+					puts "[log] #{log_message}"
+					#request_array.delete_at[i+1] # shouldn't parse command argument
+					reply_array.push("log_ok")
+				when 'time'
+					reply_array.push(Time.now.to_i)
 				end
 			end
 		else
@@ -87,7 +93,7 @@ loop {
 		request = client.gets.chomp
 		reply = parse_request(request, objects_list)
 		client.puts reply
-		puts "#{Thread.current.object_id} completed"
+		puts "Request from #{Thread.current.object_id} completed"
 		client.close
 	end
 }
