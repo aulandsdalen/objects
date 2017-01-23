@@ -88,7 +88,6 @@ l = Thread.new {
 loop {
 	Thread.start(s.accept) do |client|
 		puts "spawned #{Thread.current.object_id}"
-		puts "List of objects: #{objects_list}" # debug
 		request = client.gets.chomp
 		reply = parse_request(request, objects_list)
 		client.puts reply
