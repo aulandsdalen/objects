@@ -26,7 +26,6 @@ def parse_request(request, objects_list)
 				when 'log'
 					log_message = request_array[i+1]
 					puts "[log] #{log_message}"
-					#request_array.delete_at[i+1] # shouldn't parse command argument
 					reply_array.push("log_ok")
 				when 'time'
 					reply_array.push(Time.now.to_i)
