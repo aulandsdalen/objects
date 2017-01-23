@@ -1,5 +1,5 @@
 require 'socket'
-
+require './abstract.rb'
 
 def parse_request(request, objects_list)
 	request_array = request.split(";") # split request string based on \;\ delimiter
@@ -48,6 +48,7 @@ def log(filename, string_to_log)
 	logfile.flock(File::LOCK_EX) # lock file to be sure that we're thread-safe here
 	logfile.write("#{string_to_log}\n")
 	logfile.close
+	puts string_to_log
 end
 
 trap "SIGINT" do  # write epoch_end to file
@@ -65,7 +66,7 @@ s = TCPServer.new(addr, port)
 puts "Started #{s} at #{addr}:#{port}"
 objects_list = []
 tick_count = 0
-filename = "#{Time.now.to_s}.txt" # use current time as filename
+filename = synthesize_os_safe_filename # use current time as filename
 epoch_start = Time.now.to_i
 tick_duration = 1 # CHANGE ME 
 reference_frame = {
@@ -73,14 +74,15 @@ reference_frame = {
 	:tick_duration => tick_duration
 }
 
-log(filename, reference_frame)
+log(filename, "Starting with #{reference_frame}")
+log(filename, get_curr_ip)
 
-puts "Starting with #{reference_frame}"
+#puts "Starting with #{reference_frame}"
 
 l = Thread.new {
 	loop {
 		tick_count += 1
-		puts "tick # #{tick_count}: #{objects_list}"
+		#puts "tick # #{tick_count}: #{objects_list}"
 		log(filename, "tick # #{tick_count}: #{objects_list}")
 		sleep tick_duration
 	}
