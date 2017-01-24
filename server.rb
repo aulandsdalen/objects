@@ -42,13 +42,6 @@ def parse_request(request, objects_list)
 	reply_string
 end 
 
-def log(filename, string_to_log)
-	logfile = File.new(filename, "a+")
-	logfile.flock(File::LOCK_EX) # lock file to be sure that we're thread-safe here
-	logfile.write("#{string_to_log}\n")
-	logfile.close
-	puts string_to_log
-end
 
 trap "SIGINT" do  # write epoch_end to file
 	epoch_end = Time.now.to_i
