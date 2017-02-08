@@ -1,4 +1,5 @@
 require 'socket'
+require './protocol.rb'
 
 class Client 
 
@@ -13,7 +14,7 @@ class Client
 
 
 	def initialize(addr, port, tick_duration)
-		_r = send_request(addr, port, "uninitialized;id")
+		_r = send_request(addr, port, Protocol::Request_GET_ID)
 		@id = _r[0]
 		@epoch_start = Time.now.to_i
 		@tick_duration = tick_duration
